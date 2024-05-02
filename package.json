@@ -1,0 +1,18 @@
+{
+  "name": "socialnetapi",
+  "version": "1.0.0",
+  "description": "NoSQL database web app API",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index",
+    "dev": "nodemon index",
+    "seed": "node utils/seed",
+    "test": "node test"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^7.0.2",
+    "nodemon": "^2.0.9"
+  }
+}
