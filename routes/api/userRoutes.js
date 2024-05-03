@@ -1,10 +1,13 @@
 const router = require('express').Router();
-const {
+const { // gets functions from the controllers
     getUsers,
     getSingleUser,
     createUser,
     deleteUser,
-    updateUser
+    updateUser, 
+    createFriend,
+    deleteFriend
+
 } = require('../../controllers/userController.js');
 
 // api/users **
@@ -19,6 +22,19 @@ router
 .get(getSingleUser)
 .put(updateUser)
 .delete(deleteUser);
+
+
+
+// /api/users/:userId/friends/:friendId
+// add POST to add a new friend to a user's friend list
+// DELETE to remove a friend from a user's friend list
+// why does friends request friend id when that's not what we do for user???
+router
+.route('/:userId/friends/:friendId')
+.post(createFriend)
+.delete(deleteFriend);
+
+
 
 module.exports = router;
 
