@@ -16,16 +16,15 @@ module.exports = {
   // Get a user
   async getSingleUser(req, res) {
     try {
-      const user = await User.findOne({ _id: req.params.userId })
-      .populate('users');
+      const user = await User.findOne({ _id: req.params.userId }).populate('thoughts');
 
       if (!user) {
         return res.status(404).json({ message: 'No user with that ID' });
       }
 
-      res.json(User);
+      res.json(user);
     } catch (err) {
-      console.log('cant get single user')
+      console.log('cant get single user', err)
       res.status(500).json(err);
     }
   },

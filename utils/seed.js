@@ -1,88 +1,76 @@
-// const connection = require('../config/connection');
-// const { Thought, User } = require('../models');
-// const { getRandomUser, getRandomThought, getRandomEmail } = require('./data');
+const connection = require("../config/connection");
+const { Thought, User } = require("../models");
 
-// connection.on('error', (err) => err);
+// 🔌 Handle connection errors
+connection.on("error", (err) => console.error(err));
 
-// connection.once('open', async () => {
-//   console.log('connected');
-//     // Delete the collections if they exist
-//     let thoughtCheck = await connection.db.listCollections({ name: 'thoughts' }).toArray();
-//     if (thoughtCheck.length) {
-//       await connection.dropCollection('thoughts');
-//     }
+// 🚀 Once connected, start seeding process
+connection.once("open", async () => {
+  console.log("🔗 connected");
 
-//     let usersCheck = await connection.db.listCollections({ name: 'users' }).toArray();
-//     if (usersCheck.length) {
-//       await connection.dropCollection('users');
-//     }
+  try {
+    // 🧹 Drop existing thoughts collection if it exists
+    await connection.db
+      .dropCollection("thoughts")
+      .catch((err) => console.log("🚫 No thoughts collection to drop"));
+    // 🧹 Drop existing users collection if it exists
+    await connection.db
+      .dropCollection("users")
+      .catch((err) => console.log("🚫 No users collection to drop"));
 
+    // 🧑‍🤝‍🧑 Create example users first
+    const users = [];
+    for (let i = 0; i < 10; i++) {
+      users.push({
+        username: `user${i}`,
+        email: `user${i}@example.com`,
+      });
+    }
+    const userDocs = await User.insertMany(users);
+    console.log("👥 Users created.");
+    console.table(
+      userDocs.map((user) => ({ Username: user.username, Email: user.email }))
+    ); // 📊 Display created users in a table
 
-//   // Create empty array to hold the users
-//   const users = [];
+    // 💭 Create thoughts and reference users
+    const thoughtDocs = await Thought.insertMany(
+      userDocs.map((user, index) => ({
+        thoughtText:
+          index % 2 === 0 ? "I love pancakes" : "Today is a good day",
+        username: user.username, // Link to user's username
+      }))
+    );
+    console.log("🧠 Thoughts created.");
+    console.table(
+      thoughtDocs.map((thought) => ({
+        Thought: thought.thoughtText,
+        By: thought.username,
+      }))
+    ); // 📊 Display created thoughts in a table
 
-//   // Loop 10 times -- add users to the user array
-//   for (let i = 0; i < 10; i++) {
-//     // Get some random assignment objects using a helper function that we imported from ./data
-//     const thoughts = getRandomThought(10);
-//     const username = getRandomUser();
-//     const email = getRandomEmail();
-
-
-//     users.push({
-//       username,
-//       email,
-//       thoughts
-//     });
-//   }
-
-//   // Add users to the collection and await the results
-//   const userData = await User.insertMany(users);
-
-//   // // Add thoughts to the collection and await the results
-//   // await thought.insertOne({
-//   //   courseName: 'UCLA',
-//   //   inPerson: false,
-//   //   students: [...studentData.map(({_id}) => _id)],
-//   // });
-
-//   // Log out the seed data to indicate what should appear in the database
-//   // can leave this out -- unless/until you are trying to implement a try catch, here
-//   console.table(users);
-//   console.info('Seeding complete! 🌱');
-//   process.exit(0);
-// });
-
-const connection = require('../config/connection');
-const { Thought, User } = require('../models');
-
-connection.on('error', (err) => console.error(err));
-
-connection.once('open', async () => {
-  console.log('connected');
-
-  // Drop existing collections if they exist
-  await connection.db.dropCollection('thoughts').catch(err => console.log('No thoughts collection to drop'));
-  await connection.db.dropCollection('users').catch(err => console.log('No users collection to drop'));
-
-  // Create example thoughts
-  const thoughtDocs = await Thought.insertMany([
-    { thoughtText: "I love pancakes" },
-    { thoughtText: "Today is a good day" },
-    // Add more thoughts as needed
-  ]);
-
-  // Create users with references to these thoughts
-  const users = [];
-  for (let i = 0; i < 10; i++) {
-    users.push({
-      username: `user${i}`,
-      email: `user${i}@example.com`,
-      thoughts: thoughtDocs.map(thought => thought._id)  // Array of thought IDs
+    // 🔄 Optionally update users to hold thought references if needed
+    for (const user of userDocs) {
+      const userThoughts = thoughtDocs
+        .filter((thought) => thought.username === user.username)
+        .map((thought) => thought._id);
+      await User.findByIdAndUpdate(user._id, {
+        $set: { thoughts: userThoughts },
+      });
+    }
+    console.log("🔗 Users updated with thoughts.");
+    console.log("✅ Seeding complete! 🌱");
+    console.log("🖨 Final User-Thought Links:");
+    userDocs.forEach(async (user) => {
+      const updatedUser = await User.findById(user._id).populate("thoughts");
+      console.log(
+        `User: ${updatedUser.username}, Thoughts: ${updatedUser.thoughts
+          .map((thought) => thought.thoughtText)
+          .join(", ")}`
+      );
     });
+  } catch (err) {
+    console.error("❌ Error seeding data:", err);
+  } finally {
+    process.exit(0); // 🏁 Finish the process
   }
-
-  await User.insertMany(users);
-  console.log('Seeding complete! 🌱');
-  process.exit(0);
 });

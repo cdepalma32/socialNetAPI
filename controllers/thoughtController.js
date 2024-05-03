@@ -15,7 +15,7 @@ module.exports = {
             const thoughts = await Thought.find().sort({ createdAt: -1 });
             return res.json(thoughts);
         } catch (err) {
-            console.log('Error fetching thoughts:', error);
+            console.log('Error fetching thoughts:', err);
             return res.status(500).json({error: 'Internal Server Error'});
         }
     },
@@ -110,7 +110,40 @@ module.exports = {
             console.log(err);
             return res.status(500).json(err);
         }
-    }
+    },
+
+    // Delete a reaction to a thought
+
+    async deleteReaction(req, res) {
+        const user = await User.findOneAndUpdate(
+            { thoughts: req.params.thoughtId },
+            { $pull: { thoughts: req.params.thoughtId } },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: 'Thought deleted, but no user found' });
+            // if the thought doesn't match the user, do we change this code? --> logic review
+        }
+       
+    
+        try {
+            const thought = await Thought.findById(req.params.thoughtId);
+            if (!thought) {
+                return res.status(404).json({ message: 'Thought not found' });
+            }
+            
+            // Save the updated thought with the new reaction
+            const updatedThought = await thought.save();
+    
+            // Return the updated thought as JSON
+            return res.json(updatedThought);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    },
+
     
                     }
                     

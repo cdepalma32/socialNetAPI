@@ -41,7 +41,7 @@ const thoughtSchema = new Schema(
 
 // this code snippet creates a virtual property friendCount 
 thoughtSchema.virtual('reactionCount').get(function() {
-    returnthis.reactions.length;
+    return this.reactions.length;
 
 });
 
