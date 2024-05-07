@@ -133,61 +133,40 @@ module.exports = {
     }
 },
 
-
-    // // Add a reaction to a thought
-    // async addReaction(req, res) {
-    //     try {
-    //         const thought = await Thought.findById(req.params.thoughtId);
-    //         if (!thought) {
-    //             return res.status(404).json({ message: 'Thought not found' });
-    //         }
-    //         // Assuming req.body contains new reaction data, add a new reaction to the thought's reactions array
-    //         thought.reactions.push(req.body);
-            
-    //         // Save the updated thought with the new reaction
-    //         const updatedThought = await thought.save();
-    
-    //         // Return the updated thought as JSON
-    //         return res.json(updatedThought);
-    //     } catch (err) {
-    //         console.log(err);
-    //         return res.status(500).json(err);
-    //     }
-    // },
-
-    // Delete a reaction to a thought
-
-    async deleteReaction(req, res) {
-        const user = await User.findOneAndUpdate(
-            { thoughts: req.params.thoughtId },
-            { $pull: { thoughts: req.params.thoughtId } },
-            { new: true }
-        );
-
-        if (!user) {
-            return res.status(404).json({ message: 'Thought deleted, but no user found' });
-            // if the thought doesn't match the user, do we change this code? --> logic review
+// Delete a reaction to a thought
+async deleteReaction(req, res) {
+    try {
+        console.log('got to delete a reaction');
+        // Find the thought by its ID
+        const thought = await Thought.findById(req.params.thoughtId);
+        if (!thought) {
+            console.log("Thought not found");
+            return res.status(404).json({ message: 'Thought not found' });
         }
-       
-    
-        try {
-            const thought = await Thought.findById(req.params.thoughtId);
-            if (!thought) {
-                return res.status(404).json({ message: 'Thought not found' });
-            }
-            
-            // Save the updated thought with the new reaction
-            const updatedThought = await thought.save();
-    
-            // Return the updated thought as JSON
-            return res.json(updatedThought);
-        } catch (err) {
-            console.log(err);
-            return res.status(500).json(err);
-        }
-    },
+        console.log("Found thought:", thought);
 
+        // Find the index of the reaction to be deleted
+        const reactionIndex = thought.reactions.findIndex(reaction => reaction._id.toString() === req.params.reactionId);
+        if (reactionIndex === -1) {
+            console.log("Reaction not found");
+            return res.status(404).json({ message: 'Reaction not found' });
+        }
+        console.log("Found reaction at index:", reactionIndex);
+
+        // Remove the reaction from the reactions array
+        thought.reactions.splice(reactionIndex, 1);
+
+        // Save the updated thought without the deleted reaction
+        const updatedThought = await thought.save();
+
+        // Return the updated thought as JSON
+        return res.json(updatedThought);
+    } catch (err) {
+        console.error("Error deleting reaction:", err);
+        return res.status(500).json(err);
+    }
     
-                    }
+    }
+}
                     
                     

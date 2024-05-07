@@ -16,7 +16,7 @@ const thoughtSchema = new Schema(
     createdAt: {
       type: Date,
       default: Date.now
-      // DOUBLE CHECK TIMESTAMPS & Use a getter method to format the timestamp on query
+      
     },
 
     username: 
@@ -26,20 +26,20 @@ const thoughtSchema = new Schema(
         }
     ,
 
-    // Array of nested documents created with the reactionSchema. TO DO:
+    // Array of nested documents created with the reactionSchema
     reactions: [reactionSchema]
   },
     
  
   {
     toJSON: {
-      getters: true,
+      getters: true
     },
     id: false
   }
 );
 
-// this code snippet creates a virtual property friendCount 
+// creates a virtual property friendCount 
 thoughtSchema.virtual('reactionCount').get(function() {
     return this.reactions.length;
 

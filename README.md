@@ -8,7 +8,7 @@ NoSQL Database Web App API
   [![Video 1: Users routes](https://youtu.be/bMU8VDjXB1A)](https://youtu.be/bMU8VDjXB1A)
   [![Video 2: Thoughts routes](https://youtu.be/AVgp14LZEfQ)](https://youtu.be/AVgp14LZEfQ)
   [![Video 3: Friends routes](https://youtu.be/ZRjxpVlXFog)](https://youtu.be/ZRjxpVlXFog)
-  [![Video 4: Reactions routes](   )](   )
+  [![Video 4: Reactions routes](https://youtu.be/m96sziSvr5s)](https://youtu.be/m96sziSvr5s)
 
 
   ## Description

@@ -26,8 +26,8 @@ const reactionSchema = new Schema(
     createdAt: { 
             type: Date,
             default: Date.now
-            // DOUBLE CHECK TIMESTAMPS & Use a getter method to format the timestamp on query
-      } // changed from array to single object with type date for thoughtSchema
+            
+      } 
     
   },
   {
@@ -35,7 +35,7 @@ const reactionSchema = new Schema(
       virtuals: true,
     },
     id: false
-  }
-);
+  });
+
 
 module.exports = reactionSchema;
