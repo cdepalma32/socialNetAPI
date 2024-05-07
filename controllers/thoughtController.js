@@ -91,26 +91,69 @@ module.exports = {
             return res.status(500).json(err);
         }
     },
+
     // Add a reaction to a thought
     async addReaction(req, res) {
-        try {
-            const thought = await Thought.findById(req.params.thoughtId);
-            if (!thought) {
-                return res.status(404).json({ message: 'Thought not found' });
-            }
-            // Assuming req.body contains new reaction data, add a new reaction to the thought's reactions array
-            thought.reactions.push(req.body);
-            
-            // Save the updated thought with the new reaction
-            const updatedThought = await thought.save();
-    
-            // Return the updated thought as JSON
-            return res.json(updatedThought);
-        } catch (err) {
-            console.log(err);
-            return res.status(500).json(err);
+    try {
+        const thought = await Thought.findById(req.params.thoughtId);
+        if (!thought) {
+            console.log("Thought not found");
+            return res.status(404).json({ message: 'Thought not found' });
         }
-    },
+        console.log("Found thought:", thought);
+
+        // Assuming req.body contains new reaction data, add a new reaction to the thought's reactions array
+        console.log("Request body:", req.body);
+        thought.reactions.push(req.body);
+        
+         // Validate the thought object
+         const validationResult = thought.validateSync(); // Synchronous validation
+        
+         if (validationResult && validationResult.errors) {
+             const errors = Object.keys(validationResult.errors).map(key => ({
+                 path: key,
+                 message: validationResult.errors[key].message
+             }));
+ 
+             console.log("Validation errors:", errors);
+ 
+             return res.status(400).json({ message: 'Validation failed', errors });
+         }
+ 
+
+        // Save the updated thought with the new reaction
+        const updatedThought = await thought.save();
+        console.log("Updated thought:", updatedThought);
+
+        // Return the updated thought as JSON
+        return res.json(updatedThought);
+    } catch (err) {
+        console.error("Error adding reaction:", err);
+        return res.status(500).json(err);
+    }
+},
+
+
+    // // Add a reaction to a thought
+    // async addReaction(req, res) {
+    //     try {
+    //         const thought = await Thought.findById(req.params.thoughtId);
+    //         if (!thought) {
+    //             return res.status(404).json({ message: 'Thought not found' });
+    //         }
+    //         // Assuming req.body contains new reaction data, add a new reaction to the thought's reactions array
+    //         thought.reactions.push(req.body);
+            
+    //         // Save the updated thought with the new reaction
+    //         const updatedThought = await thought.save();
+    
+    //         // Return the updated thought as JSON
+    //         return res.json(updatedThought);
+    //     } catch (err) {
+    //         console.log(err);
+    //         return res.status(500).json(err);
+    //     }
+    // },
 
     // Delete a reaction to a thought
 

@@ -1,13 +1,13 @@
 // miniproject has answer to use reaction schema, even though it is not imported --- very similar
 
-const { Schema, model } = require('mongoose');
+const { Schema, Types } = require('mongoose');
 
 // Schema to create reaction model
 const reactionSchema = new Schema(
   {
     reactionId: {
       type: Schema.Types.ObjectId,
-      default: () => Schema.Types.ObjectId(), // changed from new Types.ObjectId() to Schema.Types....
+      default: () => new Types.ObjectId(), // changed from new Types.ObjectId() to Schema.Types....
     },
 
     reactionBody: {
